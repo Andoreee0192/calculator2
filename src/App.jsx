@@ -1,150 +1,91 @@
 import { useState } from 'react'
 import './App.css'
 
-function calculateExpression(expression) {
-  const tokens = expression.match(/(?:\d+(?:\.\d*)?|\.\d+|[+\-*/])/g)
-
-  if (!tokens) {
-    return null
-  }
-
-  const numbers = []
-  const operators = []
-
-  let currentNumber = ''
-
-  for (const token of tokens) {
-    if (['+', '-', '*', '/'].includes(token)) {
-      if (currentNumber === '') {
-        return null
-      }
-
-      numbers.push(Number(currentNumber))
-      operators.push(token)
-      currentNumber = ''
-    } else {
-      currentNumber += token
-    }
-  }
-
-  if (currentNumber === '') {
-    return null
-  }
-
-  numbers.push(Number(currentNumber))
-
-  // Multiplication and division first
-  for (let i = 0; i < operators.length; i++) {
-    if (operators[i] === '*' || operators[i] === '/') {
-      const first = numbers[i]
-      const second = numbers[i + 1]
-
-      if (operators[i] === '/' && second === 0) {
-        return null
-      }
-
-      if (operators[i] === '*') {
-        numbers[i] = first * second
-      } else {
-        numbers[i] = first / second
-      }
-
-      numbers.splice(i + 1, 1)
-      operators.splice(i, 1)
-
-      i--
-    }
-  }
-
-  // Addition and subtraction
-  let result = numbers[0]
-
-  for (let i = 0; i < operators.length; i++) {
-    if (operators[i] === '+') {
-      result += numbers[i + 1]
-    } else if (operators[i] === '-') {
-      result -= numbers[i + 1]
-    }
-  }
-
-  return result
-}
-
 function App() {
   const [display, setDisplay] = useState('0')
-  const [justCalculated, setJustCalculated] = useState(false)
+  const [firstNumber, setFirstNumber] = useState(null)
+  const [operator, setOperator] = useState(null)
+  const [waitingForNumber, setWaitingForNumber] = useState(false)
 
   const addNumber = (number) => {
-    if (display === 'Error' || justCalculated) {
+    if (display === 'Edward Andrei Suva' || display === 'Error') {
       setDisplay(number)
-      setJustCalculated(false)
       return
     }
 
-    if (display === '0') {
+    if (waitingForNumber) {
+      setDisplay(number)
+      setWaitingForNumber(false)
+    } else if (display === '0') {
       setDisplay(number)
     } else {
       setDisplay(display + number)
     }
   }
 
-  const addDecimal = () => {
-    if (display === 'Error' || justCalculated) {
-      setDisplay('0.')
-      setJustCalculated(false)
-      return
-    }
-
-    const currentNumber = display.split(/[+\-*/]/).pop()
-
-    if (currentNumber.includes('.')) {
-      return
-    }
-
-    if (/[+\-*/]$/.test(display)) {
-      setDisplay(display + '0.')
-    } else {
-      setDisplay(display + '.')
-    }
-  }
-
   const chooseOperator = (selectedOperator) => {
-    if (display === 'Error') {
+    if (display === 'Edward Andrei Suva' || display === 'Error') {
       return
     }
 
-    if (justCalculated) {
-      setDisplay(display + selectedOperator)
-      setJustCalculated(false)
-      return
+    const currentNumber = Number(display)
+
+    if (firstNumber === null) {
+      setFirstNumber(currentNumber)
     }
 
-    if (/[+\-*/]$/.test(display)) {
-      setDisplay(display.slice(0, -1) + selectedOperator)
-    } else {
-      setDisplay(display + selectedOperator)
-    }
+    setOperator(selectedOperator)
+    setWaitingForNumber(true)
   }
 
   const calculate = () => {
-    if (display === 'Error' || /[+\-*/]$/.test(display)) {
+    if (
+      firstNumber === null ||
+      operator === null ||
+      display === 'Edward Andrei Suva'
+    ) {
       return
     }
 
-    const result = calculateExpression(display)
+    const secondNumber = Number(display)
+    let result
 
-    if (result === null || !Number.isFinite(result)) {
-      setDisplay('Error')
-      return
+    if (operator === '+') {
+      result = firstNumber + secondNumber
+    } else if (operator === '-') {
+      result = firstNumber - secondNumber
+    } else if (operator === '*') {
+      result = firstNumber * secondNumber
+    } else if (operator === '/') {
+      if (secondNumber === 0) {
+        setDisplay('Error')
+        setFirstNumber(null)
+        setOperator(null)
+        setWaitingForNumber(false)
+        return
+      }
+
+      result = firstNumber / secondNumber
     }
 
     setDisplay(String(result))
-    setJustCalculated(true)
+    setFirstNumber(null)
+    setOperator(null)
+    setWaitingForNumber(false)
   }
 
   const clearDisplay = () => {
     setDisplay('0')
-    setJustCalculated(false)
+    setFirstNumber(null)
+    setOperator(null)
+    setWaitingForNumber(false)
+  }
+
+  const showFullName = () => {
+    setDisplay('Edward Andrei Suva')
+    setFirstNumber(null)
+    setOperator(null)
+    setWaitingForNumber(false)
   }
 
   return (
@@ -191,6 +132,10 @@ function App() {
           </div>
 
         </div>
+
+        <button className="surname-button" onClick={showFullName}>
+          Suva
+        </button>
 
       </div>
 
