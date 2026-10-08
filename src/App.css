@@ -49,6 +49,9 @@
   align-items: center;
 
   font-size: 40px;
+
+  white-space: nowrap;
+  overflow-x: auto;
 }
 
 .calbuttons {
@@ -57,9 +60,7 @@
 
 .calrow {
   display: flex;
-
   gap: 8px;
-
   margin-bottom: 8px;
 }
 
@@ -81,8 +82,4 @@
 
 .calrow button:hover {
   background-color: #555;
-}
-
-.zero {
-  flex: 2.1 !important;
 }
