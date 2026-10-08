@@ -97,9 +97,9 @@ function App() {
 
       <div className="calculator">
 
-        <div className="caldisplay">
-          {display}
-        </div>
+        <div className={`caldisplay ${display.length > 12 ? 'long-display' : ''}`}>
+  {display}
+</div>
 
         <div className="calbuttons">
 
